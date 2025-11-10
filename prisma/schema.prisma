@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 중고마켓 모델 (Product)
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String   @db.Text
+  price       Int
+  
+  tags        String[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  comments    Comment[] @relation("ProductComments")
+
+  @@map("products") 
+}
+
+// 자유게시판 모델 (Article)
+model Article {
+  id          String   @id @default(uuid())
+  title       String
+  content     String   @db.Text
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  comments    Comment[] @relation("ArticleComments")
+
+  @@map("articles")
+}
+
+// 댓글 모델 (Comment - Product 또는 Article에 연결)
+model Comment {
+  id          Int      @id @default(autoincrement())
+  content     String   @db.Text
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 중고마켓 상품 관계
+  productId   String?
+  product     Product?  @relation("ProductComments", fields: [productId], references: [id])
+
+  // 자유게시판 게시글 관계
+  articleId   String?
+  article     Article?  @relation("ArticleComments", fields: [articleId], references: [id])
+  
+  // 두 필드 중 하나만 null이 아니어야 함 (애플리케이션 레벨에서 강제)
+  @@map("comments")
+}
