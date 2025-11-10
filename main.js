@@ -5,8 +5,8 @@ import productsRouter from './src/routers/productsRouter.js';
 import articleRouter from './src/routers/articleRouter.js';
 import commentsRouter from './src/routers/commentsRouter.js';
 import multer from 'multer';
+import cors from 'cors';
 
-// Express 앱과 Prisma 클라이언트 인스턴스를 생성합니다.
 const app = express();
 const prisma = new PrismaClient();
 
@@ -14,9 +14,10 @@ const PORT = process.env.PORT || 3000;
 
 // JSON 요청 본문을 파싱하기 위한 미들웨어
 app.use(express.json());
+// 모든 도메인을 허용하기 위한 cors 설정
+app.use(cors());
 
 // --- 라우터 연결 ---
-
 // 1. 중고마켓 (Product) 라우터 연결 경로: /products 
 app.use('/products', productsRouter);
 
