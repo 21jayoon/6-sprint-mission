@@ -13,3 +13,112 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Article {
+  id             Int       @id @default(autoincrement())
+  title          String
+  content        String
+  image          String?
+  ArticleComment Comment[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  /* P1012 prisma schema validation error:
+   User모델과 Article 연결 되었는데 Article model 내에 또 연결해줘야하는 걸 까먹어서 다시 연결해줌. */
+  // User 모델과 1:m 관계 형성
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  /*  P1012 prisma schema validation error:
+   ArticleLike model이 article을 1:M으로 받고 있는데 article model에서 추가 연결을 안 해줘서 해소.
+   ArticleLike 모델과 1:M 형성
+   */
+  likedArticle ArticleLike[]
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       Int
+  tags        String[]
+  images      String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // User FK
+  userId Int // 상품등록 유저
+  user   User @relation(fields: [userId], references: [id])
+
+  // 1:N 관계 (댓글 및 좋아요)
+  ProductComment Comment[]
+  likes          ProductLike[] // 상품 - 유저 좋아요 연결 테이블
+}
+
+model Comment {
+  id      Int    @id @default(autoincrement())
+  content String
+
+  // Cascade 삭제: 상품/게시글이 삭제되면 댓글도 자동 삭제
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int?
+  article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // User FK
+  userId Int // 댓글 작성 유저
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  nickname     String   @unique
+  password     String
+  image        String?
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // 1:N 관계 (유저가 등록/작성한 항목)
+  // 하나의 유저는 여러 개의 products, articles, comments를 가질 수 있다-> 1:N
+  products Product[]
+  articles Article[]
+  comments Comment[]
+
+  // N:M 관계 (유저 좋아요)
+  likedProducts ProductLike[]
+  likedArticles ArticleLike[]
+}
+
+/* How to resolve N:M relation in prisma?
+   https://youtu.be/BLaezPpbXYY?si=nXwIZKEU3h5XeFrd */
+// 유저와 상품 간의 좋아요(N:M) 연결 모델 (N:M 해소 엔티티)
+model ProductLike {
+  id        Int      @id @default(autoincrement())
+  userId    Int // FK: 좋아요 누른 유저
+  productId Int // FK: 좋아요 대상 상품
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  // 복합 유니크 키: 중복 좋아요 방지
+  @@unique([userId, productId])
+}
+
+// 유저와 게시글 간의 좋아요(N:M) 연결 모델 (N:M 해소 엔티티)
+model ArticleLike {
+  id        Int      @id @default(autoincrement())
+  userId    Int // FK: 좋아요 누른 유저
+  articleId Int // FK: 좋아요 대상 게시글
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  // 복합 유니크 키: 중복 좋아요 방지
+  @@unique([userId, articleId])
+}

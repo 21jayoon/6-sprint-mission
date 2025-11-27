@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/21jayoon/6-sprint-mission/issues"
   },
-  "homepage": "https://github.com/21jayoon/6-sprint-mission#readme"
+  "homepage": "https://github.com/21jayoon/6-sprint-mission#readme",
+  "dependencies": {
+    "@prisma/client": "^7.0.1"
+  }
 }
