@@ -16,3 +16,9 @@ export const GetProductListParamsStruct = PageParamsStruct;
 //  https://gist.github.com/polarity/9742935
 //  https://medium.com/@jnkrtech/partial-function-application-in-javascript-and-flow-7f3ca87074fe
 export const UpdateProductBodyStruct = partial(CreateProductBodyStruct);
+
+/* structs 폴더의 structs파일들은 controller 단에서
+  자주 쓰일 수 밖에 없거나 반복해서 쓰이는
+  Schema Definitions(validation object)들을
+  모아두는 곳이다.
+ */

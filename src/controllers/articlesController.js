@@ -1,6 +1,6 @@
 import { create } from 'superstruct';
 import { prismaClient} from '../libs/prismaClient.js';
-import notFoundError from '../libs/errors/notFoundError.js';
+import NotFoundError from '../libs/errors/notFoundError.js';
 import { IdParamStruct} from '../structs/commonStruct.js';
 import {
   CreateArticleBodyStruct,
@@ -8,7 +8,6 @@ import {
   GetArticleListParamsStruct,
 } from '../structs/articlesStruct.js';
 import { CreateCommentBodyStruct, GetCommentListParamsStruct } from '../structs/commentsStruct.js';
-import NotFoundError from '../libs/errors/notFoundError.js';
 
 export async function createArticle(req, res) {
   /* Superstruct = A library for defining interfaces and validating data
