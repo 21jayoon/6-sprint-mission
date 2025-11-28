@@ -7,7 +7,6 @@ import {
   UpdateArticleBodyStruct,
   GetArticleListParamsStruct,
 } from '../structs/articlesStruct.js';
-import { CreateCommentBodyStruct, GetCommentListParamsStruct } from '../structs/commentsStruct.js';
 
 export async function createArticle(req, res) {
   /* Superstruct = A library for defining interfaces and validating data
